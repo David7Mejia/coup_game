@@ -1,6 +1,10 @@
 import random
+from django.db import transaction
+from .models import GameState
 
+@transaction.atomic
 def initialize_game(num_players):
+    print(num_players, 'asdsadsdadasdadsasd')
     if num_players < 3:
         raise ValueError("At least 3 players are required to start the game.")
 
@@ -26,10 +30,11 @@ def initialize_game(num_players):
 
     # Initialize the game state
     game_state = {
+        'num_players': num_players,
         'players': players,
         'current_turn': 0,  # Initialize the turn to the first player
         'game_status': 'not_started',
-        'total_coins_in_pile': total_coins,  # Track the total coins available
+        'treasury': total_coins,  # Track the total coins available
         'deck_card_counts': initial_card_counts.copy(),  # Track card counts
     }
 
@@ -50,4 +55,42 @@ def initialize_game(num_players):
             game_state['deck_card_counts'][card] -= 1
 
     # Return the initialized game state
-    return game_state
+
+    game_instance = GameState.objects.create(**game_state)
+    return game_instance.id
+
+@transaction.atomic
+def update_game(game_id, new_state):
+    try:
+        game_instance = GameState.objects.get(id=game_id)
+        game_instance.set_game_state(new_state)
+    except GameState.DoesNotExist:
+        raise ValueError(f"Game with ID {game_id} does not exist.")
+
+
+@transaction.atomic
+def start_game(game_id, start):
+    try:
+        game_instance = GameState.objects.get(id=game_id)
+        game_state = game_instance.get_game_state()
+
+        # Update the game state
+        game_state['game_status'] = 'started' if start else 'not_started'
+
+        # Save the updated state back to the database
+        game_instance.set_game_state(game_state)
+    except GameState.DoesNotExist:
+        raise ValueError("Game with provided ID does not exist.")
+
+
+def get_game_state(game_id):
+    try:
+        game_instance = GameState.objects.get(id=game_id)
+        return game_instance.get_game_state()
+    except GameState.DoesNotExist:
+        return None
+
+
+@transaction.atomic
+def challenge_action(game_id, challenger_id, target_player_id, challenged_action):
+    game_instance
