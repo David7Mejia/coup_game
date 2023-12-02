@@ -1,8 +1,8 @@
 import random
 
 def initialize_game(num_players):
-    if num_players < 2:
-        raise ValueError("At least 2 players are required to start the game.")
+    if num_players < 3:
+        raise ValueError("At least 3 players are required to start the game.")
 
     if num_players > 6:
         raise ValueError("The maximum number of players allowed is 6.")
