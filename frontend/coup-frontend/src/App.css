@@ -24,13 +24,23 @@ body {
 .top-container {
   display: flex;
   /* flex-direction: column; */
+
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
   gap: 20px;
 }
 
 .column-box {
-  border: 1px solid gray;
+  border: 1px solid #d8d8d8;
+  padding: 0 8px;
+}
+
+.game-info-holder,
+.actions-holder {
+  background-color: #f8f8f8;
+  border-radius: 12px;
+  border: 1px solid black;
+  padding: 1rem;
 }
 
 .player-container {
@@ -100,8 +110,9 @@ body {
   color: black;
   font-size: 12px;
   flex-direction: column;
-  background-color: #d8d8d8;
+  background-color: #f8f8f8;
   border-radius: 12px;
+  border: 1px solid black;
   padding: 8px;
 }
 
@@ -113,10 +124,9 @@ body {
 .card-2 {
   background-color: black;
 }
- .card-1 {
+.card-1 {
   background-color: purple;
 }
-
 
 .card-3 {
   background-color: green;
@@ -137,4 +147,8 @@ body {
 .card-5 {
   height: 200px;
   width: 100px;
+}
+
+thead {
+  border-bottom: 1px black solid;
 }

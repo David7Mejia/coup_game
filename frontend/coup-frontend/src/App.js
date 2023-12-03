@@ -31,7 +31,6 @@ function App() {
   //COUP
   const [showCoup, setShowCoup] = useState(false);
 
-
   // Handler to toggle the visibility of API components
   const toggleSteal = () => {
     setShowSteal(!showSteal);
@@ -40,7 +39,7 @@ function App() {
   const toggleAssassinate = () => {
     setShowAssassinate(!showAssassinate);
   };
-  const toggleCoup= () => {
+  const toggleCoup = () => {
     setShowCoup(!showCoup);
   };
 
@@ -83,29 +82,29 @@ function App() {
     return data;
   };
 
-   const income = async () => {
-     const response = await fetch(`http://localhost:8000/api/income/${gameId}/`, {
-       method: "POST",
-       headers: {
-         "Content-Type": "application/json",
-       },
-     });
-     const data = await response.json();
-     setData(data);
-     return data;
-   };
+  const income = async () => {
+    const response = await fetch(`http://localhost:8000/api/income/${gameId}/`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    const data = await response.json();
+    setData(data);
+    return data;
+  };
 
-   const foreignAid = async () => {
-     const response = await fetch(`http://localhost:8000/api/foreign_aid/${gameId}/`, {
-       method: "POST",
-       headers: {
-         "Content-Type": "application/json",
-       },
-     });
-     const data = await response.json();
-     setData(data);
-     return data;
-   };
+  const foreignAid = async () => {
+    const response = await fetch(`http://localhost:8000/api/foreign_aid/${gameId}/`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    const data = await response.json();
+    setData(data);
+    return data;
+  };
 
   useEffect(() => {
     if (data) {
@@ -123,23 +122,22 @@ function App() {
           <h2>Let the Game Begin!</h2>
           <div className="top-container">
             <SummaryCard />
-            <div>
+            <div className="game-info-holder">
               <p>Game ID: {gameId}</p>
               <p>Current Player: {turn} </p>
               <p>Treasury: {treasury}</p>
               <p>Deck: {deck}</p>
             </div>
-            <div>
+            <div className="actions-holder">
               <h2>General Actions</h2>
               <div>
                 <button onClick={() => income()}>Income</button>
                 <button onClick={toggleCoup}>Coup</button>
-
                 <button onClick={() => foreignAid()}>Foreign Aid</button>
+                <button onClick={() => challenge()}>Challenge</button>
               </div>
               <h2>Influence Actions</h2>
               <div>
-                <p onClick={() => challenge()}>Challenge</p>
                 <button onClick={toggleAssassinate}>Assassin: Assassinate</button>
                 <button onClick={toggleExchange}>Ambassador: Exchange</button>
                 <button onClick={toggleSteal}>Captain: Steal</button>
