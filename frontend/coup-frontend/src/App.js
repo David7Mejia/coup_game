@@ -5,10 +5,10 @@ import InitializeGame from "./components/InitializeGame";
 import SummaryCard from "./components/SummaryCard";
 //challenge
 import Assassinate from "./components/Assassinate";
-//exchange
+import Exchange from "./components/Exchange";
 import Steal from "./components/Steal";
 import Tax from "./components/Tax";
-import Exchange from "./components/Exchange";
+import Coup from "./components/Coup";
 import cn from "classnames";
 
 function App() {
@@ -21,25 +21,29 @@ function App() {
   const [players, setPlayers] = useState(/* your players state here */);
 
   //EXCHANGE
-  const [temporaryCards, setTemporaryCards] = useState([]);
-  const [selectedCards, setSelectedCards] = useState([]);
-  const [exchangeCompleted, setExchangeCompleted] = useState(false);
-  const [selectedTemporaryCards, setSelectedTemporaryCards] = useState([]);
   const [selectedCardForExchange, setSelectedCardForExchange] = useState(null);
-
   //STEAL
   const [showSteal, setShowSteal] = useState(false);
   //ASSASSINATE
   const [showAssassinate, setShowAssassinate] = useState(false);
   //EXCHANGE
   const [showExchange, setShowExchange] = useState(false);
-  // Handler to toggle the visibility of the Steal component
+  //COUP
+  const [showCoup, setShowCoup] = useState(false);
+
+
+  // Handler to toggle the visibility of API components
   const toggleSteal = () => {
     setShowSteal(!showSteal);
   };
+
   const toggleAssassinate = () => {
     setShowAssassinate(!showAssassinate);
   };
+  const toggleCoup= () => {
+    setShowCoup(!showCoup);
+  };
+
   const toggleExchange = () => {
     setShowExchange(!showExchange);
   };
@@ -79,51 +83,29 @@ function App() {
     return data;
   };
 
-  // const exchange = async () => {
-  //   try {
-  //     const response = await fetch(`http://localhost:8000/api/exchange/${gameId}/`, {
-  //       method: "POST",
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //       },
-  //     });
-  //     const data = await response.json();
-  //     setTemporaryCards(data.temporary_cards);
-  //   } catch (error) {
-  //     console.error("Error:", error);
-  //   }
-  // };
+   const income = async () => {
+     const response = await fetch(`http://localhost:8000/api/income/${gameId}/`, {
+       method: "POST",
+       headers: {
+         "Content-Type": "application/json",
+       },
+     });
+     const data = await response.json();
+     setData(data);
+     return data;
+   };
 
-  // const handleCardSelection = card => {
-  //   // If the card is already selected, deselect it
-  //   if (selectedTemporaryCards.includes(card)) {
-  //     setSelectedTemporaryCards(prevSelected => prevSelected.filter(selectedCard => selectedCard !== card));
-  //   } else {
-  //     // If the card is not selected, select it
-  //     setSelectedTemporaryCards(prevSelected => [...prevSelected, card]);
-  //   }
-  // };
-
-  // const handleExchangeConfirmation = async () => {
-  //   try {
-  //     const response = await fetch(`http://localhost:8000/api/exchange/confirm/${gameId}/`, {
-  //       method: "PUT",
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //       },
-  //       body: JSON.stringify({
-  //         selected_temporary_cards: selectedTemporaryCards,
-  //         selected_card_for_exchange: selectedCardForExchange,
-  //       }),
-  //     });
-  //     const data = await response.json();
-  //     setData(data);
-  //     setExchangeCompleted(true);
-  //     // Optionally handle the updated game state from the response
-  //   } catch (error) {
-  //     console.error("Error:", error);
-  //   }
-  // };
+   const foreignAid = async () => {
+     const response = await fetch(`http://localhost:8000/api/foreign_aid/${gameId}/`, {
+       method: "POST",
+       headers: {
+         "Content-Type": "application/json",
+       },
+     });
+     const data = await response.json();
+     setData(data);
+     return data;
+   };
 
   useEffect(() => {
     if (data) {
@@ -148,11 +130,17 @@ function App() {
               <p>Deck: {deck}</p>
             </div>
             <div>
-              <h2>Actions</h2>
+              <h2>General Actions</h2>
+              <div>
+                <button onClick={() => income()}>Income</button>
+                <button onClick={toggleCoup}>Coup</button>
+
+                <button onClick={() => foreignAid()}>Foreign Aid</button>
+              </div>
+              <h2>Influence Actions</h2>
               <div>
                 <p onClick={() => challenge()}>Challenge</p>
                 <button onClick={toggleAssassinate}>Assassin: Assassinate</button>
-                {/* <Exchange gameId={gameId} setData={setData} players={players} /> */}
                 <button onClick={toggleExchange}>Ambassador: Exchange</button>
                 <button onClick={toggleSteal}>Captain: Steal</button>
                 <button onClick={() => tax()}>Duke: Tax</button>
@@ -160,8 +148,8 @@ function App() {
             </div>
           </div>
           {showAssassinate && <Assassinate gameId={gameId} players={players} currentTurn={turn} setData={setData} />}
+          {showCoup && <Coup gameId={gameId} players={players} currentTurn={turn} setData={setData} />}
           {showSteal && <Steal gameId={gameId} players={players} currentTurn={turn} setData={setData} />}
-          {/* {showExchange && <h1>HELLO</h1>} */}
           {showExchange && <Exchange gameId={gameId} players={players} currentTurn={turn} setData={setData} selectedCardForExchange={selectedCardForExchange} />}
           <div className="player-container">
             {data &&

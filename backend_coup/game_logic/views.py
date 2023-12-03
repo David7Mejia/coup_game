@@ -82,8 +82,76 @@ class ChallengeView(APIView):
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
-# INFLUENCE ACTIONS
+# GENERAL ACTIONS
+class IncomeView(APIView):
+    def post(self, request, game_id):
+        try:
+            game_instance = GameState.objects.get(id=game_id)
+            game_state = game_instance.get_game_state()
 
+            # Assuming the current player is the one taking the action
+            current_player_id = game_state['current_turn']
+            current_player = game_state['players'][current_player_id]
+
+            # Add 1 coin to the current player's coins
+            current_player['coins'] += 1
+            game_state['treasury'] -= 1
+            # Update game state
+            game_instance.set_game_state(game_state)
+            return Response({'message': 'Income action completed', 'game_data': game_state})
+
+        except GameState.DoesNotExist:
+            return Response({'error': 'Game not found'}, status=status.HTTP_404_NOT_FOUND)
+
+
+class ForeignAidView(APIView):
+    def post(self, request, game_id):
+        try:
+            game_instance = GameState.objects.get(id=game_id)
+            game_state = game_instance.get_game_state()
+
+            # Assuming the current player is the one taking the action
+            current_player_id = game_state['current_turn']
+            current_player = game_state['players'][current_player_id]
+
+            # Add 2 coins to the current player's coins
+            current_player['coins'] += 2
+            game_state['treasury'] -= 2
+            # Update game state
+            game_instance.set_game_state(game_state)
+            return Response({'message': 'Foreign aid action completed', 'game_data': game_state})
+
+        except GameState.DoesNotExist:
+            return Response({'error': 'Game not found'}, status=status.HTTP_404_NOT_FOUND)
+
+
+class CoupView(APIView):
+    def post(self, request, game_id, target_id, card_id):
+        try:
+            game_instance = GameState.objects.get(id=game_id)
+            game_state = game_instance.get_game_state()
+
+            current_player_id = game_state['current_turn']
+            current_player = game_state['players'][current_player_id]
+
+            if current_player['coins'] >= 7:
+                current_player['coins'] -= 7
+                game_state['treasury'] += 7
+
+                target_player = game_state['players'][target_id]
+
+                target_player['cards'].pop(card_id)
+
+
+                game_instance.set_game_state(game_state)
+                return Response({'message': 'Coup action completed', 'game_data': game_state})
+            else:
+                return Response({'error': 'Not enough coins'}, status=status.HTTP_400_BAD_REQUEST)
+
+        except GameState.DoesNotExist:
+            return Response({'error': 'Game not found'}, status=status.HTTP_404_NOT_FOUND)
+
+# INFLUENCE ACTIONS
 
 class DukeTaxView(APIView):
     def post(self, request, game_id):

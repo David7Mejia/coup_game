@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 
-const Assassinate = ({ gameId, players, currentTurn, setData }) => {
+const Coup = ({ gameId, players, currentTurn, setData }) => {
   const [selectedTargetPlayerID, setSelectedTargetPlayerID] = useState(null);
-  const [cardToAssassinate, setCardToAssassinate] = useState(null);
+  const [cardToCoup, setCardToCoup] = useState(null);
 
-  const assassinate = async (targetPlayerID, cardToAssassinate) => {
-    const response = await fetch(`http://localhost:8000/api/assassinate/${gameId}/${targetPlayerID}/${cardToAssassinate}/`, {
+  const coup = async (targetPlayerID, cardToCoup) => {
+    const response = await fetch(`http://localhost:8000/api/coup/${gameId}/${targetPlayerID}/${cardToCoup}/`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -19,12 +19,12 @@ const Assassinate = ({ gameId, players, currentTurn, setData }) => {
 
   return (
     <div>
-      <h3>Select a player to assassinate:</h3>
+      <h3>Select a player to perform Coup!:</h3>
       {players.map(player => {
         if (`Player ${player.id + 1}` !== currentTurn) {
           return (
             <div key={player.id}>
-              <button onClick={() => setSelectedTargetPlayerID(player.id)}>Assassinate {player.name}</button>
+              <button onClick={() => setSelectedTargetPlayerID(player.id)}>Coup against {player.name}</button>
             </div>
           );
         }
@@ -33,21 +33,21 @@ const Assassinate = ({ gameId, players, currentTurn, setData }) => {
 
       {selectedTargetPlayerID != null && (
         <div>
-          <h3>Select a card to assassinate:</h3>
+          <h3>Select an Influence card to Coup:</h3>
           {/* Assuming each player has a cards property which is an array of card names */}
           {players
             .find(player => player.id === selectedTargetPlayerID)
             .cards.map((card, index) => (
-              <button key={index} onClick={() => setCardToAssassinate(index)}>
-                Assassinate Card: {card}
+              <button key={index} onClick={() => setCardToCoup(index)}>
+                Coup Card: {card}
               </button>
             ))}
         </div>
       )}
 
-      {cardToAssassinate != null && <button onClick={() => assassinate(selectedTargetPlayerID, cardToAssassinate)}>Confirm Assassinate</button>}
+      {cardToCoup != null && <button onClick={() => coup(selectedTargetPlayerID, cardToCoup)}>Confirm Coup</button>}
     </div>
   );
 };
 
-export default Assassinate;
+export default Coup;
