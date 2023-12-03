@@ -1,9 +1,11 @@
 from django.db import models
 import json
 
+
 class GameState(models.Model):
     num_players = models.IntegerField()
-    players = models.JSONField(default=list)  # Requires PostgreSQL or Django 3.1+
+    # Requires PostgreSQL or Django 3.1+
+    players = models.JSONField(default=list)
     current_turn = models.IntegerField(default=0)
     game_status = models.CharField(max_length=20, default='not_started')
     treasury = models.IntegerField()
@@ -18,6 +20,7 @@ class GameState(models.Model):
 
     def get_game_state(self):
         return {
+            "game_id": self.id,
             "num_players": self.num_players,
             "players": self.players,
             "current_turn": self.current_turn,

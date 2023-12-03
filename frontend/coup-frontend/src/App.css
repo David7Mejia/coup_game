@@ -1,0 +1,140 @@
+body {
+  /* color: white; */
+  /* background-image: radial-gradient(circle, #202678, #102467, #062056, #041c44, #061733, #07142c, #071025, #050b1e, #050920, #060621, #080423, #0b0124); */
+}
+#root {
+}
+
+.App {
+}
+
+.game-container {
+  padding: 2rem;
+}
+
+.game-info {
+  display: flex;
+}
+.player-input {
+  width: 80px;
+  font-size: 40px;
+  border-radius: 12px;
+  padding-left: 1rem;
+}
+.top-container {
+  display: flex;
+  /* flex-direction: column; */
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+}
+
+.column-box {
+  border: 1px solid gray;
+}
+
+.player-container {
+  display: flex;
+  align-items: center;
+  margin: 1rem;
+}
+
+.player {
+  border: 1px solid #ddd;
+  width: 200px;
+  text-align: center;
+  padding: 1rem;
+}
+
+.player-top {
+}
+
+.player-bottom {
+  display: flex;
+  flex-direction: column;
+  width: 500px;
+}
+
+.player-name {
+  font-weight: bold;
+}
+
+.player-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.player-count-container {
+  display: flex;
+  flex-direction: column;
+  width: 500px;
+  align-self: center;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  gap: 20px;
+  border-radius: 12px;
+  background-color: #d8d8d89b;
+}
+
+.card-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.card-cols {
+  display: flex;
+  /* flex-direction: column; */
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+}
+
+.selected-card {
+  background-color: lightblue; /* Add your preferred styling */
+}
+
+/* TABLE  */
+
+.summary-table {
+  color: black;
+  font-size: 12px;
+  flex-direction: column;
+  background-color: #d8d8d8;
+  border-radius: 12px;
+  padding: 8px;
+}
+
+.col-titles {
+}
+
+.human-cards {
+}
+.card-2 {
+  background-color: black;
+}
+ .card-1 {
+  background-color: purple;
+}
+
+
+.card-3 {
+  background-color: green;
+}
+
+.card-4 {
+  background-color: blue;
+}
+
+.card-5 {
+  background-color: red;
+}
+
+.card-1,
+.card-2,
+.card-3,
+.card-4,
+.card-5 {
+  height: 200px;
+  width: 100px;
+}
