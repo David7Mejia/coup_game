@@ -7,7 +7,7 @@ urlpatterns = [
     path('start_game/', StartGameView.as_view(), name='start_game'),
     path('game_state/<int:game_id>/', GameStateView.as_view(), name='get_state'),
     path('challenge/<int:game_id>/', ChallengeView.as_view(), name='challenge'),
-    path('assassinate/<int:game_id>/',
+    path('assassinate/<int:game_id>/<int:target_id>/<int:card_id>/',
          AssassinAssassinateView.as_view(), name='start_game'),
     path('exchange/<int:game_id>/',
          AmbassadorExchangeView.as_view(), name='start_game'),

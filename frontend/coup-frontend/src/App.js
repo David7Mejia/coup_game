@@ -2,9 +2,14 @@
 import React, { useEffect, useState } from "react";
 import "./App.css";
 import InitializeGame from "./components/InitializeGame";
-import Steal from "./components/Steal";
-import cn from "classnames";
 import SummaryCard from "./components/SummaryCard";
+//challenge
+import Assassinate from "./components/Assassinate";
+//exchange
+import Steal from "./components/Steal";
+import Tax from "./components/Tax";
+import Exchange from "./components/Exchange";
+import cn from "classnames";
 
 function App() {
   const [gameId, setGameId] = useState(null);
@@ -24,10 +29,19 @@ function App() {
 
   //STEAL
   const [showSteal, setShowSteal] = useState(false);
-
+  //ASSASSINATE
+  const [showAssassinate, setShowAssassinate] = useState(false);
+  //EXCHANGE
+  const [showExchange, setShowExchange] = useState(false);
   // Handler to toggle the visibility of the Steal component
   const toggleSteal = () => {
     setShowSteal(!showSteal);
+  };
+  const toggleAssassinate = () => {
+    setShowAssassinate(!showAssassinate);
+  };
+  const toggleExchange = () => {
+    setShowExchange(!showExchange);
   };
 
   const handleGameInitialized = gameData => {
@@ -52,12 +66,6 @@ function App() {
     console.log(data);
     return data;
   };
-  const assassinate = async () => {
-    const response = await fetch(`http://localhost:8000/api/assassinate/`);
-    const data = await response.json();
-    console.log(data);
-    return data;
-  };
 
   const tax = async () => {
     const response = await fetch(`http://localhost:8000/api/tax/${gameId}/`, {
@@ -71,51 +79,51 @@ function App() {
     return data;
   };
 
-  const exchange = async () => {
-    try {
-      const response = await fetch(`http://localhost:8000/api/exchange/${gameId}/`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      const data = await response.json();
-      setTemporaryCards(data.temporary_cards);
-    } catch (error) {
-      console.error("Error:", error);
-    }
-  };
+  // const exchange = async () => {
+  //   try {
+  //     const response = await fetch(`http://localhost:8000/api/exchange/${gameId}/`, {
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //     });
+  //     const data = await response.json();
+  //     setTemporaryCards(data.temporary_cards);
+  //   } catch (error) {
+  //     console.error("Error:", error);
+  //   }
+  // };
 
-  const handleCardSelection = card => {
-    // If the card is already selected, deselect it
-    if (selectedTemporaryCards.includes(card)) {
-      setSelectedTemporaryCards(prevSelected => prevSelected.filter(selectedCard => selectedCard !== card));
-    } else {
-      // If the card is not selected, select it
-      setSelectedTemporaryCards(prevSelected => [...prevSelected, card]);
-    }
-  };
+  // const handleCardSelection = card => {
+  //   // If the card is already selected, deselect it
+  //   if (selectedTemporaryCards.includes(card)) {
+  //     setSelectedTemporaryCards(prevSelected => prevSelected.filter(selectedCard => selectedCard !== card));
+  //   } else {
+  //     // If the card is not selected, select it
+  //     setSelectedTemporaryCards(prevSelected => [...prevSelected, card]);
+  //   }
+  // };
 
-  const handleExchangeConfirmation = async () => {
-    try {
-      const response = await fetch(`http://localhost:8000/api/exchange/confirm/${gameId}/`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          selected_temporary_cards: selectedTemporaryCards,
-          selected_card_for_exchange: selectedCardForExchange,
-        }),
-      });
-      const data = await response.json();
-      setData(data);
-      setExchangeCompleted(true);
-      // Optionally handle the updated game state from the response
-    } catch (error) {
-      console.error("Error:", error);
-    }
-  };
+  // const handleExchangeConfirmation = async () => {
+  //   try {
+  //     const response = await fetch(`http://localhost:8000/api/exchange/confirm/${gameId}/`, {
+  //       method: "PUT",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //       body: JSON.stringify({
+  //         selected_temporary_cards: selectedTemporaryCards,
+  //         selected_card_for_exchange: selectedCardForExchange,
+  //       }),
+  //     });
+  //     const data = await response.json();
+  //     setData(data);
+  //     setExchangeCompleted(true);
+  //     // Optionally handle the updated game state from the response
+  //   } catch (error) {
+  //     console.error("Error:", error);
+  //   }
+  // };
 
   useEffect(() => {
     if (data) {
@@ -141,17 +149,20 @@ function App() {
             </div>
             <div>
               <h2>Actions</h2>
-
               <div>
                 <p onClick={() => challenge()}>Challenge</p>
-                <p onClick={() => assassinate()}>Assassin Assassinate</p>
-                <button onClick={() => exchange()}>Ambassador: Exchange</button>
+                <button onClick={toggleAssassinate}>Assassin: Assassinate</button>
+                {/* <Exchange gameId={gameId} setData={setData} players={players} /> */}
+                <button onClick={toggleExchange}>Ambassador: Exchange</button>
                 <button onClick={toggleSteal}>Captain: Steal</button>
                 <button onClick={() => tax()}>Duke: Tax</button>
               </div>
             </div>
           </div>
+          {showAssassinate && <Assassinate gameId={gameId} players={players} currentTurn={turn} setData={setData} />}
           {showSteal && <Steal gameId={gameId} players={players} currentTurn={turn} setData={setData} />}
+          {/* {showExchange && <h1>HELLO</h1>} */}
+          {showExchange && <Exchange gameId={gameId} players={players} currentTurn={turn} setData={setData} selectedCardForExchange={selectedCardForExchange} />}
           <div className="player-container">
             {data &&
               data.game_data.players.map((player, i) => (
@@ -185,26 +196,6 @@ function App() {
                 </div>
               ))}
           </div>
-          {/* Additional UI for card selection and exchange confirmation */}
-          {temporaryCards.length > 0 && !exchangeCompleted && (
-            <div>
-              <h3>Temporary Cards</h3>
-              {temporaryCards.map((card, index) => (
-                <div key={index} onClick={() => handleCardSelection(card)} className={selectedTemporaryCards.includes(card) ? "selected-card" : ""}>
-                  {card}
-                </div>
-              ))}
-              <button onClick={() => handleExchangeConfirmation()}>Confirm Exchange</button>
-            </div>
-          )}
-
-          {exchangeCompleted && (
-            <div>
-              <p>Exchange completed!</p>
-              {/* Additional UI or actions after the exchange */}
-            </div>
-          )}
-          {/* Other game components go here */}
         </div>
       )}
     </div>

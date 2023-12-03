@@ -84,6 +84,7 @@ class ChallengeView(APIView):
 
 # INFLUENCE ACTIONS
 
+
 class DukeTaxView(APIView):
     def post(self, request, game_id):
         print('game IDeeeeeeeeeeeee', game_id)
@@ -107,7 +108,7 @@ class DukeTaxView(APIView):
 
 
 class AssassinAssassinateView(APIView):
-    def post(self, request, game_id, target_id):
+    def post(self, request, game_id, target_id, card_id):
         try:
             game_instance = GameState.objects.get(id=game_id)
             game_state = game_instance.get_game_state()
@@ -117,12 +118,14 @@ class AssassinAssassinateView(APIView):
 
             if current_player['coins'] >= 3:
                 current_player['coins'] -= 3
+                game_state['treasury'] += 3
+
                 target_player = game_state['players'][target_id]
 
-                # Add assassination logic here
+                target_player['cards'].pop(card_id)
 
                 game_instance.set_game_state(game_state)
-                return Response({'message': 'Assassination attempt made', 'game_state': game_state})
+                return Response({'message': 'Assassination attempt made', 'game_data': game_state})
             else:
                 return Response({'error': 'Not enough coins'}, status=status.HTTP_400_BAD_REQUEST)
 
