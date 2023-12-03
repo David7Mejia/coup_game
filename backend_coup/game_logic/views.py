@@ -84,7 +84,6 @@ class ChallengeView(APIView):
 
 # INFLUENCE ACTIONS
 
-
 class DukeTaxView(APIView):
     def post(self, request, game_id):
         print('game IDeeeeeeeeeeeee', game_id)
@@ -141,12 +140,12 @@ class CaptainStealView(APIView):
             current_player = game_state['players'][current_player_id]
             target_player = game_state['players'][target_id]
 
-            steal_amount = min(target_player['coins'], 2)
+            steal_amount = 2
             target_player['coins'] -= steal_amount
             current_player['coins'] += steal_amount
 
             game_instance.set_game_state(game_state)
-            return Response({'message': f'Stolen {steal_amount} coins', 'game_state': game_state})
+            return Response({'message': f'Stolen {steal_amount} coins', 'game_data': game_state})
 
         except GameState.DoesNotExist:
             return Response({'error': 'Game not found'}, status=status.HTTP_404_NOT_FOUND)

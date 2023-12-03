@@ -13,7 +13,7 @@ urlpatterns = [
          AmbassadorExchangeView.as_view(), name='start_game'),
     path('exchange/confirm/<int:game_id>/',
          AmbassadorExchangeView.as_view(), name='confirm_exchange'),
-    path('steal/<int:game_id>/<int:target_id>',
+    path('steal/<int:game_id>/<int:target_id>/',
          CaptainStealView.as_view(), name='start_game'),
     path('tax/<int:game_id>/', DukeTaxView.as_view(), name='tax'),
 ]

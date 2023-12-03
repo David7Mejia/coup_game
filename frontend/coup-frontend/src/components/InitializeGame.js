@@ -8,7 +8,6 @@ const InitializeGame = ({ setData }) => {
     axios
       .post("http://localhost:8000/api/set_players/", { num_players: numPlayers, start: true })
       .then(response => {
-        // console.log("repspne", response);
         setData(response.data);
       })
       .catch(error => console.error("Error:", error));

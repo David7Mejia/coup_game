@@ -2,8 +2,7 @@
 import React, { useEffect, useState } from "react";
 import "./App.css";
 import InitializeGame from "./components/InitializeGame";
-import GeneralActions from "./components/GeneralActions";
-import InfluenceActions from "./components/InfluenceActions";
+import Steal from "./components/Steal";
 import cn from "classnames";
 import SummaryCard from "./components/SummaryCard";
 
@@ -14,12 +13,22 @@ function App() {
   const [treasury, setTreasury] = useState(null);
   const [deck, setDeck] = useState(null);
   const [turn, setTurn] = useState(null);
+  const [players, setPlayers] = useState(/* your players state here */);
 
+  //EXCHANGE
   const [temporaryCards, setTemporaryCards] = useState([]);
   const [selectedCards, setSelectedCards] = useState([]);
   const [exchangeCompleted, setExchangeCompleted] = useState(false);
   const [selectedTemporaryCards, setSelectedTemporaryCards] = useState([]);
   const [selectedCardForExchange, setSelectedCardForExchange] = useState(null);
+
+  //STEAL
+  const [showSteal, setShowSteal] = useState(false);
+
+  // Handler to toggle the visibility of the Steal component
+  const toggleSteal = () => {
+    setShowSteal(!showSteal);
+  };
 
   const handleGameInitialized = gameData => {
     if (gameData) {
@@ -29,7 +38,7 @@ function App() {
       setTreasury(gameData.game_data.treasury);
       setTurn(gameData.game_data.players[gameData.game_data.current_turn].name);
       setDeck(Object.values(gameData.game_data.deck_card_counts).reduce((a, b) => a + b));
-
+      setPlayers(gameData.game_data.players);
       setGameInitialized(true);
     } else {
       // Handle any initialization errors
@@ -38,20 +47,13 @@ function App() {
   };
 
   const challenge = async () => {
-    const response = await fetch(`http://localhost:8000/api/challenge/${gameId}`);
+    const response = await fetch(`http://localhost:8000/api/challenge/${gameId}/`);
     const data = await response.json();
     console.log(data);
     return data;
   };
   const assassinate = async () => {
     const response = await fetch(`http://localhost:8000/api/assassinate/`);
-    const data = await response.json();
-    console.log(data);
-    return data;
-  };
-
-  const steal = async () => {
-    const response = await fetch(`http://localhost:8000/api/steal/${gameId}`);
     const data = await response.json();
     console.log(data);
     return data;
@@ -65,11 +67,10 @@ function App() {
       },
     });
     const data = await response.json();
-    console.log("tac data: ", data);
     setData(data);
     return data;
   };
-  //GPT exchange cards
+
   const exchange = async () => {
     try {
       const response = await fetch(`http://localhost:8000/api/exchange/${gameId}/`, {
@@ -79,7 +80,6 @@ function App() {
         },
       });
       const data = await response.json();
-      console.log("TEMP CARDS", data);
       setTemporaryCards(data.temporary_cards);
     } catch (error) {
       console.error("Error:", error);
@@ -109,7 +109,6 @@ function App() {
         }),
       });
       const data = await response.json();
-      console.log(data);
       setData(data);
       setExchangeCompleted(true);
       // Optionally handle the updated game state from the response
@@ -118,11 +117,7 @@ function App() {
     }
   };
 
-  //
-
   useEffect(() => {
-    console.log("this is the data", data);
-    console.log("turn", turn);
     if (data) {
       handleGameInitialized(data);
     }
@@ -151,11 +146,12 @@ function App() {
                 <p onClick={() => challenge()}>Challenge</p>
                 <p onClick={() => assassinate()}>Assassin Assassinate</p>
                 <button onClick={() => exchange()}>Ambassador: Exchange</button>
-                <p onClick={() => steal()}>Captain: Steal</p>
+                <button onClick={toggleSteal}>Captain: Steal</button>
                 <button onClick={() => tax()}>Duke: Tax</button>
               </div>
             </div>
           </div>
+          {showSteal && <Steal gameId={gameId} players={players} currentTurn={turn} setData={setData} />}
           <div className="player-container">
             {data &&
               data.game_data.players.map((player, i) => (
