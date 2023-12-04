@@ -9,7 +9,7 @@ from rest_framework import status
 
 # @transaction.atomic
 # def initialize_game(num_players, start):
-#     print(num_players, 'asdsadsdadasdadsasd')
+#     print(num_players, 'Initializing game...')
 #     if num_players < 3:
 #         raise ValueError("At least 3 players are required to start the game.")
 
@@ -69,7 +69,6 @@ from rest_framework import status
 
 
 def initialize_game(num_players, start):
-    print(num_players, 'Initializing game...')
 
     if num_players < 3:
         raise ValueError("At least 3 players are required to start the game.")
@@ -79,8 +78,17 @@ def initialize_game(num_players, start):
     initial_card_counts = {'Duke': 3, 'Assassin': 3,
                            'Captain': 3, 'Ambassador': 3, 'Contessa': 3}
 
-    players = [{'id': player_id, 'name': f'Player {player_id + 1}',
-                'coins': 2, 'cards': []} for player_id in range(num_players)]
+    players = []
+
+    for player_id in range(num_players):
+        player = {
+            'id': player_id,
+            'name': f'Player {player_id + 1}',
+            'coins': 2,
+            'cards': [],
+            'is_human': player_id == 0,  # First player is human, rest are bots
+        }
+        players.append(player)
 
     total_coins = 50 - (num_players * 2)
 

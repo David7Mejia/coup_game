@@ -1,12 +1,13 @@
 from django.urls import path
 from . import views
-from .views import SetPlayersView, StartGameView, GameStateView, ChallengeView, AmbassadorExchangeView, CaptainStealView, AssassinAssassinateView, DukeTaxView, IncomeView, ForeignAidView, CoupView
+from .views import SetPlayersView, StartGameView, GameStateView, ChallengeView, AmbassadorExchangeView, CaptainStealView, AssassinAssassinateView, DukeTaxView, IncomeView, ForeignAidView, CoupView, NextTurnView
 
 urlpatterns = [
     path('set_players/', SetPlayersView.as_view(), name='set-players'),
     path('start_game/', StartGameView.as_view(), name='start_game'),
     path('game_state/<int:game_id>/', GameStateView.as_view(), name='get_state'),
     path('challenge/<int:game_id>/', ChallengeView.as_view(), name='challenge'),
+    path('next_turn/<int:game_id>/', NextTurnView.as_view(), name='next_turn'),
     # General Action
     path('income/<int:game_id>/', IncomeView.as_view(), name='income'),
 

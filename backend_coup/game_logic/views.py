@@ -53,6 +53,109 @@ class GameStateView(APIView):
             return Response({"error": "Game not found."}, status=status.HTTP_404_NOT_FOUND)
 
 
+
+# Define available actions for bots
+available_actions = ['Income', 'ForeignAid', 'Coup', 'DukeTax',
+                     'AssassinAssassinate', 'CaptainSteal', 'AmbassadorExchange']
+
+
+
+class NextTurnView(APIView):
+    def post(self, request, game_id):
+        try:
+            game_instance = GameState.objects.get(id=game_id)
+            game_state = game_instance.get_game_state()
+
+            current_player_id = game_state['current_turn']
+            current_player = game_state['players'][current_player_id]
+
+            # Check if the current player is human based on the 'is_human' flag
+            if current_player.get('is_human'):
+                # Human player logic
+                set_turn = game_state['current_turn'] + 1
+                if set_turn >= len(game_state['players']):
+                    set_turn = 0
+
+                game_state['current_turn'] = set_turn
+                game_instance.set_game_state(game_state)
+                return Response({'message': 'Next turn', 'game_data': game_state})
+            else:
+                # Bot player logic (select a random action from available_actions)
+                selected_action = random.choice(available_actions)
+
+                # Implement action-specific logic for bot players based on selected_action
+                if selected_action == 'Income':
+                    # Bot Income logic
+                    current_player['coins'] += 1
+                    game_state['treasury'] -= 1
+                elif selected_action == 'ForeignAid':
+                    # Bot Foreign Aid logic
+                    current_player['coins'] += 2
+                    game_state['treasury'] -= 2
+                elif selected_action == 'Coup':
+                    # Bot Coup logic
+                    # Replace target_id and card_id with your logic to choose a target and card to coup
+                    target_id = 0  # Replace with your logic
+                    card_id = 0  # Replace with your logic
+
+                    if current_player['coins'] >= 7:
+                        current_player['coins'] -= 7
+                        game_state['treasury'] += 7
+
+                        target_player = game_state['players'][target_id]
+
+                        # Remove the target player's card based on card_id
+                        target_player['cards'].pop(card_id)
+                elif selected_action == 'DukeTax':
+                    # Bot DukeTax logic
+                    current_player['coins'] += 3
+                    game_state['treasury'] -= 3
+                elif selected_action == 'AssassinAssassinate':
+                    # Bot AssassinAssassinate logic
+                    # Replace target_id and card_id with your logic to choose a target and card to assassinate
+                    target_id = 0  # Replace with your logic
+                    card_id = 0  # Replace with your logic
+
+                    if current_player['coins'] >= 3:
+                        current_player['coins'] -= 3
+                        game_state['treasury'] += 3
+
+                        target_player = game_state['players'][target_id]
+
+                        # Remove the target player's card based on card_id
+                        target_player['cards'].pop(card_id)
+                elif selected_action == 'CaptainSteal':
+                    # Bot CaptainSteal logic
+                    # Replace target_id with your logic to choose a target to steal from
+                    target_id = 0  # Replace with your logic
+
+                    steal_amount = 2
+                    target_player = game_state['players'][target_id]
+                    target_player['coins'] -= steal_amount
+                    current_player['coins'] += steal_amount
+                elif selected_action == 'AmbassadorExchange':
+                    # Bot AmbassadorExchange logic
+                    # Simulate drawing 2 random cards from the Court deck
+                    court_deck = game_state['deck_card_counts']
+                    court_deck_keys = list(court_deck.keys())
+                    random.shuffle(court_deck_keys)
+                    temporary_cards = court_deck_keys[:2]
+
+                    # Update game state to reflect temporary cards for the current player
+                    current_player['temporary_cards'] = temporary_cards
+                else:
+                    # Handle other actions here
+                    pass
+
+                # Update the game state
+                game_instance.set_game_state(game_state)
+                return Response({'message': f'Bot player {current_player_id} took action: {selected_action}', 'game_data': game_state})
+
+        except GameState.DoesNotExist:
+            return Response({'error': 'Game not found'}, status=status.HTTP_404_NOT_FOUND)
+
+# Other views...
+
 class ChallengeView(APIView):
     """Challenge a player's action in a game"""
 
@@ -260,8 +363,10 @@ class AmbassadorExchangeView(APIView):
             current_player_id = game_state['current_turn']
             current_player = game_state['players'][current_player_id]
 
-            selected_card_for_exchange_ids = request.data.get('selected_card_for_exchange', [])
-            selected_temporary_cards_types = request.data.get('selected_temporary_cards', [])
+            selected_card_for_exchange_ids = request.data.get(
+                'selected_card_for_exchange', [])
+            selected_temporary_cards_types = request.data.get(
+                'selected_temporary_cards', [])
 
             # Perform the card exchange
             new_cards = []
@@ -269,7 +374,8 @@ class AmbassadorExchangeView(APIView):
                 if card.get('id') in selected_card_for_exchange_ids:
                     # Replace with temporary cards
                     for card_type in selected_temporary_cards_types:
-                        new_card = {'type': card_type, 'id': card['id']}  # Reuse the same ID or generate a new one
+                        # Reuse the same ID or generate a new one
+                        new_card = {'type': card_type, 'id': card['id']}
                         new_cards.append(new_card)
                 else:
                     new_cards.append(card)
@@ -283,4 +389,5 @@ class AmbassadorExchangeView(APIView):
 
         except GameState.DoesNotExist:
             return Response({'error': 'Game not found'}, status=status.HTTP_404_NOT_FOUND)
+
 

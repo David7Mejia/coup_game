@@ -63,6 +63,18 @@ function App() {
     }
   };
 
+  const nextTurn = async () => {
+    const response = await fetch(`http://localhost:8000/api/next_turn/${gameId}/`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    const data = await response.json();
+    setData(data);
+    return data;
+  };
+
   const challenge = async () => {
     const response = await fetch(`http://localhost:8000/api/challenge/${gameId}/`);
     const data = await response.json();
@@ -91,22 +103,22 @@ function App() {
     });
     const data = await response.json();
     setData(data);
+    nextTurn();
     return data;
   };
 
- const handleCardSelection = card => {
-   const cardId = card.id; // Assuming each card has a unique 'id' attribute
-   console.log("Selected Card ID:", cardId);
+  const handleCardSelection = card => {
+    const cardId = card.id; // Assuming each card has a unique 'id' attribute
+    console.log("Selected Card ID:", cardId);
 
-   setSelectedCardForExchange(prevSelected => {
-     if (prevSelected.includes(cardId)) {
-       return prevSelected.filter(id => id !== cardId); // Remove the card ID
-     } else {
-       return [...prevSelected, cardId]; // Add the card ID
-     }
-   });
- };
-
+    setSelectedCardForExchange(prevSelected => {
+      if (prevSelected.includes(cardId)) {
+        return prevSelected.filter(id => id !== cardId); // Remove the card ID
+      } else {
+        return [...prevSelected, cardId]; // Add the card ID
+      }
+    });
+  };
 
   const foreignAid = async () => {
     const response = await fetch(`http://localhost:8000/api/foreign_aid/${gameId}/`, {

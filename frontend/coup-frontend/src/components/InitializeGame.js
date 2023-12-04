@@ -23,4 +23,3 @@ const InitializeGame = ({ setData }) => {
 };
 
 export default InitializeGame;
-
