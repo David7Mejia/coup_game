@@ -12,14 +12,14 @@ const Steal = ({ gameId, players, currentTurn, setData, nextTurn }) => {
     });
     const data = await response.json();
     setData(data);
-    nextTurn();
+    nextTurn(`Player 1 Stole 2 coins from Player ${players[targetPlayerID].name}`);
+
     return data;
   };
 
   return (
     <div>
       <h3>Select a player to steal from:</h3>
-      {console.log("CURRENT TURN ", currentTurn)}
       {players.map(player => {
         if (`Player ${player.id + 1}` !== currentTurn) {
           // Exclude the current player

@@ -9,7 +9,10 @@ import Exchange from "./components/Exchange";
 import Steal from "./components/Steal";
 import Tax from "./components/Tax";
 import Coup from "./components/Coup";
+import GameMoves from "./components/GameMoves";
 import cn from "classnames";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function App() {
   const [gameId, setGameId] = useState(null);
@@ -19,6 +22,21 @@ function App() {
   const [deck, setDeck] = useState(null);
   const [turn, setTurn] = useState(null);
   const [players, setPlayers] = useState(/* your players state here */);
+
+  const renderCoins = numberOfCoins => {
+    let coins = [];
+    for (let i = 0; i < numberOfCoins; i++) {
+      coins.push(<div key={i} className="coin"></div>);
+    }
+    return coins;
+  };
+
+  const notify = () =>
+    toast("Thank you for reaching out. Someone will contact you at the email you have provided shortly.", {
+      hideProgressBar: true,
+      theme: "dark",
+      className: "single-case-toast",
+    });
 
   //EXCHANGE
   const [selectedCardForExchange, setSelectedCardForExchange] = useState([]);
@@ -49,25 +67,28 @@ function App() {
 
   const handleGameInitialized = gameData => {
     if (gameData) {
-      console.log("DAAAATAAAA: ", gameData);
 
-      setGameId(gameData.game_data.game_id);
-      setTreasury(gameData.game_data.treasury);
-      setTurn(gameData?.game_data?.players[gameData.game_data.current_turn].name);
-      setDeck(Object.values(gameData.game_data.deck_card_counts).reduce((a, b) => a + b));
-      setPlayers(gameData.game_data.players);
+      setGameId(gameData?.game_data?.game_id);
+      setTreasury(gameData?.game_data?.treasury);
+      setTurn(gameData?.game_data?.players[gameData?.game_data?.current_turn]?.name);
+      setDeck(Object?.values(gameData?.game_data?.deck_card_counts)?.reduce((a, b) => a + b));
+      setPlayers(gameData?.game_data?.players);
       setGameInitialized(true);
     } else {
       // e.g., display an error message to the user
     }
   };
 
-  const nextTurn = async () => {
+  const nextTurn = async (action) => {
+
     const response = await fetch(`http://localhost:8000/api/next_turn/${gameId}/`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
+      body: JSON.stringify({
+        action: action,
+      }),
     });
     const data = await response.json();
     setData(data);
@@ -77,7 +98,6 @@ function App() {
   const challenge = async () => {
     const response = await fetch(`http://localhost:8000/api/challenge/${gameId}/`);
     const data = await response.json();
-    console.log(data);
     return data;
   };
 
@@ -90,7 +110,8 @@ function App() {
     });
     const data = await response.json();
     setData(data);
-    nextTurn();
+      nextTurn("Player 1 Gained 3 coins from Duke Tax");
+
 
     return data;
   };
@@ -101,16 +122,16 @@ function App() {
       headers: {
         "Content-Type": "application/json",
       },
+
     });
     const data = await response.json();
     setData(data);
-    nextTurn();
+    nextTurn("Player 1 Gained 1 coin from Income");
     return data;
   };
 
   const handleCardSelection = card => {
     const cardId = card.id; // Assuming each card has a unique 'id' attribute
-    console.log("Selected Card ID:", cardId);
 
     setSelectedCardForExchange(prevSelected => {
       if (prevSelected.includes(cardId)) {
@@ -119,6 +140,18 @@ function App() {
         return [...prevSelected, cardId]; // Add the card ID
       }
     });
+  };
+
+  const restartGame = async () => {
+    const response = await fetch(`http://localhost:8000/api/restart_game/`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    const data = await response.json();
+    setData(data);
+    return data;
   };
 
   const foreignAid = async () => {
@@ -130,13 +163,14 @@ function App() {
     });
     const data = await response.json();
     setData(data);
-    nextTurn();
+    nextTurn("Player 1 Gained 2 coins from Foreign Aid");
     return data;
   };
 
   useEffect(() => {
     if (data) {
       handleGameInitialized(data);
+      notify();
     }
   }, [data]);
 
@@ -150,6 +184,7 @@ function App() {
           <h2>Let the Game Begin!</h2>
           <div className="top-container">
             <SummaryCard />
+            <button onClick={restartGame}>Restart Game</button>
             <div className="game-info-holder">
               <p>Game ID: {gameId}</p>
               <p>Current Player: {turn} </p>
@@ -172,6 +207,7 @@ function App() {
                 <button onClick={() => tax()}>Duke: Tax</button>
               </div>
             </div>
+            <GameMoves data={data} />
           </div>
           {showAssassinate && <Assassinate gameId={gameId} players={players} currentTurn={turn} setData={setData} nextTurn={nextTurn} />}
           {showCoup && <Coup gameId={gameId} players={players} currentTurn={turn} setData={setData} nextTurn={nextTurn} />}
@@ -242,7 +278,10 @@ function App() {
                       </div>
                     </div>
 
-                    <div>Coins: {player.coins}</div>
+                    <div>
+                      Coins: {player.coins}
+                      <div className="coin-holder">{renderCoins(player.coins)}</div>
+                    </div>
                   </div>
                 </div>
               ))}

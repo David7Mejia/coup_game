@@ -25,7 +25,6 @@ const Exchange = ({ gameId, setData, players, selectedCardForExchange, handleCar
   }, []);
 
   const handleTemporaryCardSelection = card => {
-    console.log("THIS IS THE CARD TO TEMP", card);
     setSelectedTemporaryCards(prevSelected => {
       if (prevSelected.includes(card)) {
         // Remove card from selection
@@ -36,8 +35,6 @@ const Exchange = ({ gameId, setData, players, selectedCardForExchange, handleCar
       }
     });
   };
-  console.log("TEMP", selectedTemporaryCards);
-  console.log("exchange", selectedCardForExchange);
 
   const handleExchangeConfirmation = async () => {
     try {
@@ -52,10 +49,10 @@ const Exchange = ({ gameId, setData, players, selectedCardForExchange, handleCar
         }),
       });
       const data = await response.json();
-      console.log("dataaaaaaaaaaa", data);
       setData(data);
       setExchangeCompleted(true);
-      nextTurn();
+          nextTurn(`Player 1 exchanged cards`);
+
       // Optionally handle the updated game state from the response
     } catch (error) {
       console.error("Error:", error);

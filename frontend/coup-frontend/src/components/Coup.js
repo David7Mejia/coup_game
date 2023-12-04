@@ -3,6 +3,7 @@ import React, { useState } from "react";
 const Coup = ({ gameId, players, currentTurn, setData, nextTurn }) => {
   const [selectedTargetPlayerID, setSelectedTargetPlayerID] = useState(null);
   const [cardToCoup, setCardToCoup] = useState(null);
+  const currentPlayer = players.find(player => player.id === currentTurn - 1); // Assuming currentTurn starts from 1
 
   const coup = async (targetPlayerID, cardToCoup) => {
     const response = await fetch(`http://localhost:8000/api/coup/${gameId}/${targetPlayerID}/${cardToCoup}/`, {
@@ -12,9 +13,9 @@ const Coup = ({ gameId, players, currentTurn, setData, nextTurn }) => {
       },
     });
     const data = await response.json();
-    console.log("response", response);
     setData(data);
-    nextTurn();
+    nextTurn(`Player 1 performed Coup on Card from Player ${players[targetPlayerID].name}`);
+
     return data;
   };
 
@@ -25,7 +26,9 @@ const Coup = ({ gameId, players, currentTurn, setData, nextTurn }) => {
         if (`Player ${player.id + 1}` !== currentTurn) {
           return (
             <div key={player.id}>
-              <button onClick={() => setSelectedTargetPlayerID(player.id)}>Coup against {player.name}</button>
+              <button disabled={currentPlayer && currentPlayer.coins < 7} onClick={() => setSelectedTargetPlayerID(player.id)}>
+                Coup against {player.name}
+              </button>
             </div>
           );
         }
@@ -40,7 +43,7 @@ const Coup = ({ gameId, players, currentTurn, setData, nextTurn }) => {
             .find(player => player.id === selectedTargetPlayerID)
             .cards.map((card, index) => (
               <button key={index} onClick={() => setCardToCoup(index)}>
-                Coup Card: {card}
+                Coup Card: {card.type}
               </button>
             ))}
         </div>

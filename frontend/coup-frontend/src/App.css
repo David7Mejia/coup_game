@@ -16,6 +16,25 @@ body {
   display: flex;
 }
 
+.move-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  border-radius: 12px;
+  border: 1px black solid;
+  padding: 1rem;
+  background-color: #f8f8f8;
+  height: 300px;
+  width: 200px;
+  overflow: auto;
+}
+.coin-holder {
+  display: flex;
+  gap: 10px;
+}
+
 .coin {
   border-radius: 20px;
   height: 10px;

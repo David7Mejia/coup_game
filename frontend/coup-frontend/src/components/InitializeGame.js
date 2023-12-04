@@ -6,16 +6,16 @@ const InitializeGame = ({ setData }) => {
 
   const startGame = () => {
     axios
-      .post("http://localhost:8000/api/set_players/", { num_players: numPlayers, start: true })
+      .post("http://localhost:8000/api/set_players/", { num_players: Number(numPlayers), start: true })
       .then(response => {
         setData(response.data);
       })
       .catch(error => console.error("Error:", error));
   };
-
   return (
     <div className="player-count-container">
       <h1>How many players will join?</h1>
+      <h2>(min:3 | max:6)</h2>
       <input className="player-input" type="number" value={numPlayers} onChange={e => setNumPlayers(e.target.value)} />
       <button onClick={startGame}>Start Game</button>
     </div>

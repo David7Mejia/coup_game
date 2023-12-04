@@ -13,9 +13,9 @@ const Assassinate = ({ gameId, players, currentTurn, setData, nextTurn }) => {
       },
     });
     const data = await response.json();
-    console.log("response", response);
     setData(data);
-    nextTurn();
+    nextTurn(`Player 1 Assassinated Card from Player ${players[targetPlayerID].name}`);
+
     return data;
   };
 
