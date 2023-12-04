@@ -23,7 +23,9 @@ pip install -r requirements.txt
 ```
 
 ## Example .env file
-
+```
+place here: /backend_coup
+```
 ```
 DB_NAME=''
 DB_USER=''
