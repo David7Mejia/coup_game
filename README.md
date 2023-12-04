@@ -1,3 +1,24 @@
+# Coup The Game (ok the foundations of a FullStack Coup game)
+
+ The app is made using Django/Python3.x for the backend and React/JS for the frontend.
+ For setup instructions, please see below. The game uses a PostgreSQL database.
+ Due to time constraints not all the actions were implemented.
+### Actions:
+- Income
+- Foreign Aid
+- Coup
+- Tax
+- Assassinate
+- Exchange
+- Steal
+
+### No counteractions or challenge were implemented (yet), the UI is fairly basic (see attached image in directory)
+You choose the number of players
+Then you start the game Player 1 being human and the rest being bots.
+
+## There is still a lot to implement (Version1.0 ) but the basics are there, and it provides a good foundation for a basic experience as an MVP.
+
+
 # Frontend
 ## Project setup
 ```
