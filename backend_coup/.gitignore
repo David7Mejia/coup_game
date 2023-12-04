@@ -21,7 +21,13 @@ npm-debug.log
 # Environment-specific settings
 .env
 /env
+.env.*
+*.env
+*.env.*
+.env.local
+/vars
 
+/vars.env
 
 # Database files
 db.sqlite3
