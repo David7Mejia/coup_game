@@ -229,7 +229,6 @@ class NextTurnView(APIView):
             current_player = game_state['players'][current_player_id]
 
             if current_player.get('is_human'):
-                print('request data________________________________', request.data)
                 human_action = request.data.get('action', 'Unknown')
                 record_action(current_player_id, human_action)
                 update_turn()

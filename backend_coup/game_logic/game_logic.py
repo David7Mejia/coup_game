@@ -69,62 +69,6 @@ def initialize_game(num_players, start):
     return game_state
 
 
-# @transaction.atomic
-# def initialize_game(num_players, start):
-#     print(num_players, 'Initializing game...')
-
-#     if num_players < 3:
-#         raise ValueError("At least 3 players are required to start the game.")
-#     if num_players > 6:
-#         raise ValueError("The maximum number of players allowed is 6.")
-
-#     initial_card_counts = {'Duke': 3, 'Assassin': 3,
-#                            'Captain': 3, 'Ambassador': 3, 'Contessa': 3}
-
-#     players = []
-
-#     for player_id in range(num_players):
-#         player = {
-#             'id': player_id,
-#             'name': f'Player {player_id + 1}',
-#             'coins': 2,
-#             'cards': [],
-#             'is_human': player_id == 0,  # First player is human, rest are bots
-#         }
-#         players.append(player)
-
-#     # Calculate the total number of coins available in the pile
-#     total_coins = 50 - (num_players * 2)
-
-#     # Initialize the game state
-#     game_state = {
-#         'num_players': num_players,
-#         'players': players,
-#         'current_turn': 0,
-#         'game_status': 'started',
-#         'treasury': total_coins,
-#         'deck_card_counts': initial_card_counts.copy(),
-#     }
-
-#     # Create and shuffle a deck of character cards with unique numerical IDs
-#     deck = [{'id': i + 1, 'type': card_type} for i, card_type in enumerate(
-#         sum(([card] * count for card, count in initial_card_counts.items()), []))]
-#     random.shuffle(deck)
-
-#     # Distribute cards to each player sequentially
-#     for i in range(num_players):
-#         for j in range(2):
-#             card_index = i * 2 + j
-#             if card_index < len(deck):
-#                 players[i]['cards'].append(deck[card_index])
-#                 game_state['deck_card_counts'][deck[card_index]['type']] -= 1
-
-#     game_instance = GameState.objects.create(**game_state)
-#     game_state['game_id'] = game_instance.id
-
-#     return game_state
-
-
 @transaction.atomic
 def update_game(game_id, new_state):
     try:
