@@ -19,13 +19,16 @@ npm-debug.log
 .idea/
 
 # Environment-specific settings
-.env
-/env
 .env.*
 *.env
 *.env.*
 .env.local
 /vars
+
+.env
+/env
+/.env
+
 
 /vars.env
 
