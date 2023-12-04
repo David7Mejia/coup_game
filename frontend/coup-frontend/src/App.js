@@ -21,7 +21,7 @@ function App() {
   const [players, setPlayers] = useState(/* your players state here */);
 
   //EXCHANGE
-  const [selectedCardForExchange, setSelectedCardForExchange] = useState(null);
+  const [selectedCardForExchange, setSelectedCardForExchange] = useState([]);
   //STEAL
   const [showSteal, setShowSteal] = useState(false);
   //ASSASSINATE
@@ -94,6 +94,20 @@ function App() {
     return data;
   };
 
+ const handleCardSelection = card => {
+   const cardId = card.id; // Assuming each card has a unique 'id' attribute
+   console.log("Selected Card ID:", cardId);
+
+   setSelectedCardForExchange(prevSelected => {
+     if (prevSelected.includes(cardId)) {
+       return prevSelected.filter(id => id !== cardId); // Remove the card ID
+     } else {
+       return [...prevSelected, cardId]; // Add the card ID
+     }
+   });
+ };
+
+
   const foreignAid = async () => {
     const response = await fetch(`http://localhost:8000/api/foreign_aid/${gameId}/`, {
       method: "POST",
@@ -148,7 +162,9 @@ function App() {
           {showAssassinate && <Assassinate gameId={gameId} players={players} currentTurn={turn} setData={setData} />}
           {showCoup && <Coup gameId={gameId} players={players} currentTurn={turn} setData={setData} />}
           {showSteal && <Steal gameId={gameId} players={players} currentTurn={turn} setData={setData} />}
-          {showExchange && <Exchange gameId={gameId} players={players} currentTurn={turn} setData={setData} selectedCardForExchange={selectedCardForExchange} />}
+          {showExchange && (
+            <Exchange gameId={gameId} players={players} currentTurn={turn} setData={setData} selectedCardForExchange={selectedCardForExchange} handleCardSelection={handleCardSelection} />
+          )}
           <div className="player-container">
             {data &&
               data.game_data.players.map((player, i) => (
@@ -158,22 +174,51 @@ function App() {
                     <div className="card-container">
                       Cards:
                       <div className="card-cols">
-                        {player.cards.map((card, i) => (
-                          <label key={i}>
-                            <input type="radio" name="selectedCard" value={card} onChange={() => setSelectedCardForExchange(card)} checked={selectedCardForExchange === card} />
-                            <div
-                              className={cn("human-cards", {
-                                "card-1": card === "Duke",
-                                "card-2": card === "Assassin",
-                                "card-3": card === "Ambassador",
-                                "card-4": card === "Captain",
-                                "card-5": card === "Contessa",
-                              })}
-                            >
-                              {card}
-                            </div>
-                          </label>
-                        ))}
+                        {player.cards.map((card, index) => {
+                          if (player.id === 0) {
+                            // Render with checkbox for the first player
+                            return (
+                              <label key={index}>
+                                <input
+                                  type="checkbox"
+                                  name="selectedCard"
+                                  value={index} // Using index as the value
+                                  onChange={() => handleCardSelection(card)}
+                                  checked={selectedCardForExchange.includes(card.id)} // Check if the index is in the selected array
+                                />
+                                <div
+                                  className={cn("human-cards", {
+                                    "card-1": card.type === "Duke",
+                                    "card-2": card.type === "Assassin",
+                                    "card-3": card.type === "Ambassador",
+                                    "card-4": card.type === "Captain",
+                                    "card-5": card.type === "Contessa",
+                                    // ... other card styles
+                                  })}
+                                >
+                                  {card.type}
+                                </div>
+                              </label>
+                            );
+                          } else {
+                            // Just display the card for other players
+                            return (
+                              <div
+                                key={index}
+                                className={cn("human-cards", {
+                                  "card-1": card.type === "Duke",
+                                  "card-2": card.type === "Assassin",
+                                  "card-3": card.type === "Ambassador",
+                                  "card-4": card.type === "Captain",
+                                  "card-5": card.type === "Contessa",
+                                  // ... other card styles
+                                })}
+                              >
+                                {`Card ${index + 1}`}
+                              </div>
+                            );
+                          }
+                        })}
                       </div>
                     </div>
 

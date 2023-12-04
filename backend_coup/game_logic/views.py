@@ -83,6 +83,8 @@ class ChallengeView(APIView):
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 # GENERAL ACTIONS
+
+
 class IncomeView(APIView):
     def post(self, request, game_id):
         try:
@@ -142,7 +144,6 @@ class CoupView(APIView):
 
                 target_player['cards'].pop(card_id)
 
-
                 game_instance.set_game_state(game_state)
                 return Response({'message': 'Coup action completed', 'game_data': game_state})
             else:
@@ -153,9 +154,9 @@ class CoupView(APIView):
 
 # INFLUENCE ACTIONS
 
+
 class DukeTaxView(APIView):
     def post(self, request, game_id):
-        print('game IDeeeeeeeeeeeee', game_id)
         try:
             game_instance = GameState.objects.get(id=game_id)
             game_state = game_instance.get_game_state()
@@ -256,37 +257,30 @@ class AmbassadorExchangeView(APIView):
             game_instance = GameState.objects.get(id=game_id)
             game_state = game_instance.get_game_state()
 
-            # Get the current player and their selected card for exchange
             current_player_id = game_state['current_turn']
             current_player = game_state['players'][current_player_id]
-            selected_card_for_exchange = request.data.get(
-                'selected_card_for_exchange')
 
-            # Validate the selected card for exchange
-            if selected_card_for_exchange not in current_player['cards']:
-                return Response({'error': 'Selected card not found in player\'s deck'}, status=status.HTTP_400_BAD_REQUEST)
+            selected_card_for_exchange_ids = request.data.get('selected_card_for_exchange', [])
+            selected_temporary_cards_types = request.data.get('selected_temporary_cards', [])
 
-            # Get the selected temporary cards
-            selected_temporary_cards = request.data.get(
-                'selected_temporary_cards')
-
-            # Perform the card exchange by replacing the selected card(s) while keeping the other(s)
+            # Perform the card exchange
             new_cards = []
             for card in current_player['cards']:
-                if card == selected_card_for_exchange:
-                    new_cards.extend(selected_temporary_cards)
+                if card.get('id') in selected_card_for_exchange_ids:
+                    # Replace with temporary cards
+                    for card_type in selected_temporary_cards_types:
+                        new_card = {'type': card_type, 'id': card['id']}  # Reuse the same ID or generate a new one
+                        new_cards.append(new_card)
                 else:
                     new_cards.append(card)
 
             current_player['cards'] = new_cards
 
-            # Update the game state
             game_state['game_id'] = game_id
-
             game_instance.set_game_state(game_state)
 
-            # Return the new card(s) the player received along with the updated player's card list
-            return Response({'message': 'Exchange completed', 'new_cards': selected_temporary_cards, 'updated_player_cards': current_player['cards'], 'game_data': game_state})
+            return Response({'message': 'Exchange completed', 'new_cards': selected_temporary_cards_types, 'updated_player_cards': current_player['cards'], 'game_data': game_state})
 
         except GameState.DoesNotExist:
             return Response({'error': 'Game not found'}, status=status.HTTP_404_NOT_FOUND)
+

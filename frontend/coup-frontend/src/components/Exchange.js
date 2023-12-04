@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from "react";
 
-const Exchange = ({ gameId, setData, players, selectedCardForExchange }) => {
+const Exchange = ({ gameId, setData, players, selectedCardForExchange, handleCardSelection }) => {
   const [temporaryCards, setTemporaryCards] = useState([]);
   const [selectedTemporaryCards, setSelectedTemporaryCards] = useState([]);
   const [exchangeCompleted, setExchangeCompleted] = useState(false);
-  //   const [selectedCardForExchange, setSelectedCardForExchange] = useState(null);
 
   const exchange = async () => {
     try {
@@ -25,15 +24,20 @@ const Exchange = ({ gameId, setData, players, selectedCardForExchange }) => {
     exchange();
   }, []);
 
-  const handleCardSelection = card => {
-    // If the card is already selected, deselect it
-    if (selectedTemporaryCards.includes(card)) {
-      setSelectedTemporaryCards(prevSelected => prevSelected.filter(selectedCard => selectedCard !== card));
-    } else {
-      // If the card is not selected, select it
-      setSelectedTemporaryCards(prevSelected => [...prevSelected, card]);
-    }
+  const handleTemporaryCardSelection = card => {
+    console.log("THIS IS THE CARD TO TEMP", card);
+    setSelectedTemporaryCards(prevSelected => {
+      if (prevSelected.includes(card)) {
+        // Remove card from selection
+        return prevSelected.filter(selectedCard => selectedCard !== card);
+      } else {
+        // Add card to selection
+        return [...prevSelected, card];
+      }
+    });
   };
+  console.log("TEMP", selectedTemporaryCards);
+  console.log("exchange", selectedCardForExchange);
 
   const handleExchangeConfirmation = async () => {
     try {
@@ -48,6 +52,7 @@ const Exchange = ({ gameId, setData, players, selectedCardForExchange }) => {
         }),
       });
       const data = await response.json();
+      console.log("dataaaaaaaaaaa", data);
       setData(data);
       setExchangeCompleted(true);
       // Optionally handle the updated game state from the response
@@ -62,7 +67,7 @@ const Exchange = ({ gameId, setData, players, selectedCardForExchange }) => {
         <div>
           <h3>Temporary Cards</h3>
           {temporaryCards.map((card, index) => (
-            <div key={index} onClick={() => handleCardSelection(card)} className={selectedTemporaryCards.includes(card) ? "selected-card" : ""}>
+            <div key={index} onClick={() => handleTemporaryCardSelection(card)} className={selectedTemporaryCards.includes(card) ? "selected-card" : ""}>
               {card}
             </div>
           ))}
