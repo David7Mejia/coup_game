@@ -53,12 +53,11 @@ function App() {
 
       setGameId(gameData.game_data.game_id);
       setTreasury(gameData.game_data.treasury);
-      setTurn(gameData.game_data.players[gameData.game_data.current_turn].name);
+      setTurn(gameData?.game_data?.players[gameData.game_data.current_turn].name);
       setDeck(Object.values(gameData.game_data.deck_card_counts).reduce((a, b) => a + b));
       setPlayers(gameData.game_data.players);
       setGameInitialized(true);
     } else {
-      // Handle any initialization errors
       // e.g., display an error message to the user
     }
   };
@@ -91,6 +90,8 @@ function App() {
     });
     const data = await response.json();
     setData(data);
+    nextTurn();
+
     return data;
   };
 
@@ -129,6 +130,7 @@ function App() {
     });
     const data = await response.json();
     setData(data);
+    nextTurn();
     return data;
   };
 
@@ -160,7 +162,7 @@ function App() {
                 <button onClick={() => income()}>Income</button>
                 <button onClick={toggleCoup}>Coup</button>
                 <button onClick={() => foreignAid()}>Foreign Aid</button>
-                <button onClick={() => challenge()}>Challenge</button>
+                {/* <button onClick={() => challenge()}>Challenge</button> */}
               </div>
               <h2>Influence Actions</h2>
               <div>
@@ -171,15 +173,23 @@ function App() {
               </div>
             </div>
           </div>
-          {showAssassinate && <Assassinate gameId={gameId} players={players} currentTurn={turn} setData={setData} />}
-          {showCoup && <Coup gameId={gameId} players={players} currentTurn={turn} setData={setData} />}
-          {showSteal && <Steal gameId={gameId} players={players} currentTurn={turn} setData={setData} />}
+          {showAssassinate && <Assassinate gameId={gameId} players={players} currentTurn={turn} setData={setData} nextTurn={nextTurn} />}
+          {showCoup && <Coup gameId={gameId} players={players} currentTurn={turn} setData={setData} nextTurn={nextTurn} />}
+          {showSteal && <Steal gameId={gameId} players={players} currentTurn={turn} setData={setData} nextTurn={nextTurn} />}
           {showExchange && (
-            <Exchange gameId={gameId} players={players} currentTurn={turn} setData={setData} selectedCardForExchange={selectedCardForExchange} handleCardSelection={handleCardSelection} />
+            <Exchange
+              gameId={gameId}
+              players={players}
+              currentTurn={turn}
+              setData={setData}
+              selectedCardForExchange={selectedCardForExchange}
+              handleCardSelection={handleCardSelection}
+              nextTurn={nextTurn}
+            />
           )}
           <div className="player-container">
             {data &&
-              data.game_data.players.map((player, i) => (
+              data?.game_data?.players.map((player, i) => (
                 <div key={player.id} className={`player ${i === 0 ? "player-bottom" : "player-top"}`}>
                   <div className="player-name">{i === 0 ? player.name : `Bot ${player.id + 1}`}</div>
                   <div className="player-info">
@@ -196,7 +206,7 @@ function App() {
                                   name="selectedCard"
                                   value={index} // Using index as the value
                                   onChange={() => handleCardSelection(card)}
-                                  checked={selectedCardForExchange.includes(card.id)} // Check if the index is in the selected array
+                                  checked={selectedCardForExchange.includes(card.id)}
                                 />
                                 <div
                                   className={cn("human-cards", {
@@ -205,7 +215,6 @@ function App() {
                                     "card-3": card.type === "Ambassador",
                                     "card-4": card.type === "Captain",
                                     "card-5": card.type === "Contessa",
-                                    // ... other card styles
                                   })}
                                 >
                                   {card.type}
@@ -223,7 +232,6 @@ function App() {
                                   "card-3": card.type === "Ambassador",
                                   "card-4": card.type === "Captain",
                                   "card-5": card.type === "Contessa",
-                                  // ... other card styles
                                 })}
                               >
                                 {`Card ${index + 1}`}

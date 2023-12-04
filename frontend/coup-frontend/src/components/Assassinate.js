@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 
-const Assassinate = ({ gameId, players, currentTurn, setData }) => {
+const Assassinate = ({ gameId, players, currentTurn, setData, nextTurn }) => {
   const [selectedTargetPlayerID, setSelectedTargetPlayerID] = useState(null);
   const [cardToAssassinate, setCardToAssassinate] = useState(null);
+  const currentPlayer = players.find(player => player.id === currentTurn - 1); // Assuming currentTurn starts from 1
 
   const assassinate = async (targetPlayerID, cardToAssassinate) => {
     const response = await fetch(`http://localhost:8000/api/assassinate/${gameId}/${targetPlayerID}/${cardToAssassinate}/`, {
@@ -14,6 +15,7 @@ const Assassinate = ({ gameId, players, currentTurn, setData }) => {
     const data = await response.json();
     console.log("response", response);
     setData(data);
+    nextTurn();
     return data;
   };
 
@@ -24,7 +26,12 @@ const Assassinate = ({ gameId, players, currentTurn, setData }) => {
         if (`Player ${player.id + 1}` !== currentTurn) {
           return (
             <div key={player.id}>
-              <button onClick={() => setSelectedTargetPlayerID(player.id)}>Assassinate {player.name}</button>
+              <button
+                onClick={() => setSelectedTargetPlayerID(player.id)}
+                disabled={currentPlayer && currentPlayer.coins < 3} // Disable button if current player has less than 3 coins
+              >
+                Assassinate {player.name}
+              </button>
             </div>
           );
         }
@@ -39,7 +46,7 @@ const Assassinate = ({ gameId, players, currentTurn, setData }) => {
             .find(player => player.id === selectedTargetPlayerID)
             .cards.map((card, index) => (
               <button key={index} onClick={() => setCardToAssassinate(index)}>
-                Assassinate Card: {card}
+                Assassinate Card: {card.type} {/* Display the card type or any relevant property */}
               </button>
             ))}
         </div>

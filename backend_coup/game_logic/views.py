@@ -3,8 +3,12 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from .game_logic import initialize_game, start_game, get_game_state, challenge_action
+from .bot_player import BotPlayer  # Import the BotPlayer class
 from .models import GameState
 import random
+import time
+import logging
+
 
 
 # Create your views here.
@@ -53,11 +57,12 @@ class GameStateView(APIView):
             return Response({"error": "Game not found."}, status=status.HTTP_404_NOT_FOUND)
 
 
-
 # Define available actions for bots
 available_actions = ['Income', 'ForeignAid', 'Coup', 'DukeTax',
                      'AssassinAssassinate', 'CaptainSteal', 'AmbassadorExchange']
 
+# Configure logging
+logger = logging.getLogger(__name__)
 
 
 class NextTurnView(APIView):
@@ -66,95 +71,78 @@ class NextTurnView(APIView):
             game_instance = GameState.objects.get(id=game_id)
             game_state = game_instance.get_game_state()
 
+            if 'actions' not in game_state:
+                game_state['actions'] = []
+
+            def update_turn():
+                new_turn = (game_state['current_turn'] +
+                            1) % game_state['num_players']
+                game_state['current_turn'] = new_turn
+                game_instance.set_game_state(game_state)
+
+            def record_action(player_id, action):
+                game_state['actions'].append(
+                    {'player_id': player_id, 'action': action})
+
+            def process_bot_turn(bot_player_id):
+                bot_player = game_state['players'][bot_player_id]
+                start_time = time.time()
+                available_actions = ['Income', 'ForeignAid', 'DukeTax', 'AssassinAssassinate',
+                                     'CaptainSteal', 'AmbassadorExchange']  # Adjust as per your game rules
+                bot_player_instance = BotPlayer(bot_player_id)
+                selected_action = bot_player_instance.take_random_action(
+                    available_actions)
+                record_action(bot_player_id, selected_action)
+
+                # Implement action-specific logic for bot players
+                if selected_action == 'Income':
+                    bot_player['coins'] += 1
+                    game_state['treasury'] -= 1
+                elif selected_action == 'ForeignAid':
+                    bot_player['coins'] += 2
+                    game_state['treasury'] -= 2
+                elif selected_action == 'DukeTax':
+                    bot_player['coins'] += 3
+                    game_state['treasury'] -= 3
+                elif selected_action == 'AssassinAssassinate':
+                    # Implement logic for assassination (e.g., reduce coins, remove target card)
+                    pass
+                elif selected_action == 'CaptainSteal':
+                    # Implement logic for stealing (e.g., transfer coins from target to bot)
+                    pass
+                elif selected_action == 'AmbassadorExchange':
+                    # Implement logic for ambassador exchange (e.g., exchange cards)
+                    pass
+
+                # Limit bot decision to 1 second
+                while time.time() - start_time < 1:
+                    time.sleep(0.1)  # Sleep to avoid busy waiting
+
             current_player_id = game_state['current_turn']
             current_player = game_state['players'][current_player_id]
 
-            # Check if the current player is human based on the 'is_human' flag
             if current_player.get('is_human'):
-                # Human player logic
-                set_turn = game_state['current_turn'] + 1
-                if set_turn >= len(game_state['players']):
-                    set_turn = 0
-
-                game_state['current_turn'] = set_turn
-                game_instance.set_game_state(game_state)
-                return Response({'message': 'Next turn', 'game_data': game_state})
+                human_action = request.data.get('action', 'Unknown')
+                record_action(current_player_id, human_action)
+                update_turn()
             else:
-                # Bot player logic (select a random action from available_actions)
-                selected_action = random.choice(available_actions)
+                process_bot_turn(current_player_id)
+                update_turn()
 
-                # Implement action-specific logic for bot players based on selected_action
-                if selected_action == 'Income':
-                    # Bot Income logic
-                    current_player['coins'] += 1
-                    game_state['treasury'] -= 1
-                elif selected_action == 'ForeignAid':
-                    # Bot Foreign Aid logic
-                    current_player['coins'] += 2
-                    game_state['treasury'] -= 2
-                elif selected_action == 'Coup':
-                    # Bot Coup logic
-                    # Replace target_id and card_id with your logic to choose a target and card to coup
-                    target_id = 0  # Replace with your logic
-                    card_id = 0  # Replace with your logic
-
-                    if current_player['coins'] >= 7:
-                        current_player['coins'] -= 7
-                        game_state['treasury'] += 7
-
-                        target_player = game_state['players'][target_id]
-
-                        # Remove the target player's card based on card_id
-                        target_player['cards'].pop(card_id)
-                elif selected_action == 'DukeTax':
-                    # Bot DukeTax logic
-                    current_player['coins'] += 3
-                    game_state['treasury'] -= 3
-                elif selected_action == 'AssassinAssassinate':
-                    # Bot AssassinAssassinate logic
-                    # Replace target_id and card_id with your logic to choose a target and card to assassinate
-                    target_id = 0  # Replace with your logic
-                    card_id = 0  # Replace with your logic
-
-                    if current_player['coins'] >= 3:
-                        current_player['coins'] -= 3
-                        game_state['treasury'] += 3
-
-                        target_player = game_state['players'][target_id]
-
-                        # Remove the target player's card based on card_id
-                        target_player['cards'].pop(card_id)
-                elif selected_action == 'CaptainSteal':
-                    # Bot CaptainSteal logic
-                    # Replace target_id with your logic to choose a target to steal from
-                    target_id = 0  # Replace with your logic
-
-                    steal_amount = 2
-                    target_player = game_state['players'][target_id]
-                    target_player['coins'] -= steal_amount
-                    current_player['coins'] += steal_amount
-                elif selected_action == 'AmbassadorExchange':
-                    # Bot AmbassadorExchange logic
-                    # Simulate drawing 2 random cards from the Court deck
-                    court_deck = game_state['deck_card_counts']
-                    court_deck_keys = list(court_deck.keys())
-                    random.shuffle(court_deck_keys)
-                    temporary_cards = court_deck_keys[:2]
-
-                    # Update game state to reflect temporary cards for the current player
-                    current_player['temporary_cards'] = temporary_cards
+            while True:
+                next_player_id = game_state['current_turn']
+                next_player = game_state['players'][next_player_id]
+                if next_player.get('is_bot'):
+                    process_bot_turn(next_player_id)
+                    update_turn()
                 else:
-                    # Handle other actions here
-                    pass
+                    break
 
-                # Update the game state
-                game_instance.set_game_state(game_state)
-                return Response({'message': f'Bot player {current_player_id} took action: {selected_action}', 'game_data': game_state})
+            return Response({'message': 'Turn processed', 'game_data': game_state})
 
         except GameState.DoesNotExist:
             return Response({'error': 'Game not found'}, status=status.HTTP_404_NOT_FOUND)
 
-# Other views...
 
 class ChallengeView(APIView):
     """Challenge a player's action in a game"""
@@ -389,5 +377,3 @@ class AmbassadorExchangeView(APIView):
 
         except GameState.DoesNotExist:
             return Response({'error': 'Game not found'}, status=status.HTTP_404_NOT_FOUND)
-
-

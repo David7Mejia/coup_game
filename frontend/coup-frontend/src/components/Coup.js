@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-const Coup = ({ gameId, players, currentTurn, setData }) => {
+const Coup = ({ gameId, players, currentTurn, setData, nextTurn }) => {
   const [selectedTargetPlayerID, setSelectedTargetPlayerID] = useState(null);
   const [cardToCoup, setCardToCoup] = useState(null);
 
@@ -14,6 +14,7 @@ const Coup = ({ gameId, players, currentTurn, setData }) => {
     const data = await response.json();
     console.log("response", response);
     setData(data);
+    nextTurn();
     return data;
   };
 

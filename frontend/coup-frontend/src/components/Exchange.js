@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 
-const Exchange = ({ gameId, setData, players, selectedCardForExchange, handleCardSelection }) => {
+const Exchange = ({ gameId, setData, players, selectedCardForExchange, handleCardSelection, nextTurn }) => {
   const [temporaryCards, setTemporaryCards] = useState([]);
   const [selectedTemporaryCards, setSelectedTemporaryCards] = useState([]);
   const [exchangeCompleted, setExchangeCompleted] = useState(false);
@@ -55,6 +55,7 @@ const Exchange = ({ gameId, setData, players, selectedCardForExchange, handleCar
       console.log("dataaaaaaaaaaa", data);
       setData(data);
       setExchangeCompleted(true);
+      nextTurn();
       // Optionally handle the updated game state from the response
     } catch (error) {
       console.error("Error:", error);

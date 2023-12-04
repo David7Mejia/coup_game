@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-const Steal = ({ gameId, players, currentTurn, setData }) => {
+const Steal = ({ gameId, players, currentTurn, setData, nextTurn }) => {
   const [selectedTargetPlayerID, setSelectedTargetPlayerID] = useState(null);
 
   const steal = async targetPlayerID => {
@@ -12,6 +12,7 @@ const Steal = ({ gameId, players, currentTurn, setData }) => {
     });
     const data = await response.json();
     setData(data);
+    nextTurn();
     return data;
   };
 
