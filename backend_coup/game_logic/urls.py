@@ -1,6 +1,6 @@
 from django.urls import path
 from . import views
-from .views import SetPlayersView, StartGameView, GameStateView, ChallengeView, AmbassadorExchangeView, CaptainStealView, AssassinAssassinateView, DukeTaxView, IncomeView, ForeignAidView, CoupView, NextTurnView
+from .views import SetPlayersView, StartGameView, GameStateView, ChallengeView, AmbassadorExchangeView, CaptainStealView, AssassinAssassinateView, DukeTaxView, IncomeView, ForeignAidView, CoupView, NextTurnView, RestartGameView
 
 urlpatterns = [
     path('set_players/', SetPlayersView.as_view(), name='set-players'),
@@ -29,4 +29,6 @@ urlpatterns = [
     path('steal/<int:game_id>/<int:target_id>/',
          CaptainStealView.as_view(), name='steal'),
     path('tax/<int:game_id>/', DukeTaxView.as_view(), name='tax'),
+     path('restart_game/', RestartGameView.as_view(), name='restart_game'),
+
 ]

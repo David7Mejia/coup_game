@@ -69,7 +69,6 @@ def initialize_game(num_players, start):
     return game_state
 
 
-
 # @transaction.atomic
 # def initialize_game(num_players, start):
 #     print(num_players, 'Initializing game...')

@@ -1,0 +1,45 @@
+# Byte-compiled / optimized files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual environment
+venv/
+env/
+.Python
+
+# Dependency directories
+node_modules/
+yarn-error.log
+npm-debug.log
+
+# Editor/IDE-specific files
+.vscode/
+.idea/
+
+# Environment-specific settings
+.env
+/env
+
+
+# Database files
+db.sqlite3
+
+# Compiled Python files
+*.pyc
+
+# Compiled C extension files
+*.so
+
+# Logs and generated files
+*.log
+*.tmp
+*.swp
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# IDE-specific directories (e.g., PyCharm)
+.idea/
