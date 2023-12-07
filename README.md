@@ -102,4 +102,10 @@ DB_PORT=5432
 
 ```
 
+## Run Backend Server
+coup_game/backend_coup/
+```
+python manage.py runserver
+```
+
 
