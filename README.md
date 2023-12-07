@@ -74,6 +74,7 @@ sudo apt-get install postgresql postgresql-contrib
 ```
 
 ## 5 PSQL commands
+The default password for postgreSQL on download is postgres
 ```
 # Log in to the PostgreSQL interactive terminal
 sudo -u postgres psql
@@ -93,9 +94,9 @@ GRANT ALL PRIVILEGES ON DATABASE your_database_name TO your_username;
 ## Put PSQL Credentials in .env file 
 LOCATION: coup_game/backend_coup/.env
 ```
-DB_NAME=''
-DB_USER=''
-DB_PASSWORD=''
+DB_NAME=your_database_name(from above)
+DB_USER=your_username(from above)
+DB_PASSWORD=your_password(from above)
 DB_HOST=localhost
 DB_PORT=5432
 
