@@ -38,13 +38,16 @@ cd backend-coup
 ```
 
 <!-- install requirements.txt file -->
-## Install Env 
-## Create environment for backend 
+## 1 Install Env 
+```
+pip install virtualenv
+```
+## 2 Create environment for backend 
 ```
 virtualenv venv
 ```
 
-## Activate Env
+## 3 Activate Env
 ```
 - On Windows:
     
@@ -58,24 +61,11 @@ virtualenv venv
     source venv/bin/activate
   
 ```
+## 4 Install requirements.txt file
 ```
 pip install -r requirements.txt
 ```
-
-## Example .env file
-```
-place here: /backend_coup
-```
-```
-DB_NAME=''
-DB_USER=''
-DB_PASSWORD=''
-DB_HOST=localhost
-DB_PORT=5432
-
-```
-## Simple PSQL install/setup
-
+# **If PSQL is not installed follow these instructions:
 ### Example (Linux with apt):
 
 ```
@@ -83,13 +73,7 @@ sudo apt-get update
 sudo apt-get install postgresql postgresql-contrib
 ```
 
-
-### Example (macOS with Homebrew):
-```
-brew install postgresql
-```
-
-### PSQL commands
+## 5 PSQL commands
 ```
 # Log in to the PostgreSQL interactive terminal
 sudo -u postgres psql
@@ -105,3 +89,16 @@ GRANT ALL PRIVILEGES ON DATABASE your_database_name TO your_username;
 \q
 
 ```
+
+## Put PSQL Credentials in .env file 
+LOCATION: coup_game/backend_coup/.env
+```
+DB_NAME=''
+DB_USER=''
+DB_PASSWORD=''
+DB_HOST=localhost
+DB_PORT=5432
+
+```
+
+
